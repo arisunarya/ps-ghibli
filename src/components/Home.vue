@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <div>{{films.length}}</div>
     <div class="row-filmCard">
       <div v-for="film in films" :key="film.index" class="col-filmCard">
         <router-link :to="`/film/${film.id}`" class="filmCard">
@@ -19,13 +18,11 @@
 import store from '@/store'
 export default {
   beforeRouteEnter (to, from, next) {
-    store.dispatch('getFilms').then(() => {
-      next()
-    })
+    store.dispatch('getFilms').then(() => next())
   },
   computed: {
     films () {
-      return this.$store.getters.films
+      return store.getters.films
     }
   }
 }

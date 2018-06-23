@@ -1,17 +1,38 @@
 <template>
   <div id="app">
+    <div class="container">
+      <br/>
+      <br/>
+      <router-link to="/">Films ({{films.length}})</router-link>
+      &nbsp;
+      <router-link to="/people">People ({{0}})</router-link>
+      <br/>
+      <br/>
+    </div>
     <!--<img src="./assets/logo.png">-->
     <router-view/>
   </div>
 </template>
 
 <script>
+import store from '@/store'
 export default {
-  name: 'App'
+  name: 'App',
+  beforeRouteEnter (to, from, next) {
+    store.dispatch('getFilms').then(() => next())
+  },
+  computed: {
+    films () {
+      return store.getters.films
+    }
+  }
 }
 </script>
 
 <style>
+a {
+  text-decoration: none;
+}
 *,
 *:before,
 *:after {

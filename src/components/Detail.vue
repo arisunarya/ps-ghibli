@@ -1,45 +1,151 @@
 <template>
-  <div class="container page">
-    <div class="page-thumbnail"></div>
-    <div class="page-content">
-      <h1 class="page-title">{{film.title}}</h1>
-      <p class="page-paragraph">{{film.description}}</p>
-      <div class="page-rating">
-        <span class="page-rating-label">Rating</span>
-        <span class="page-rating-value">{{film.rt_score}}</span>
+  <div class="container">
+    <div class="page">
+      <div class="page-thumbnail"></div>
+      <div class="page-content">
+        <h1 class="page-title">{{film.title}}</h1>
+        <p class="page-paragraph">{{film.description}}</p>
+        <div class="page-rating">
+          <span class="page-rating-label">Rating</span>
+          <span class="page-rating-value">{{film.rt_score}}</span>
+        </div>
+        <ul class="page-info">
+          <li>
+            <span class="page-info-label">Director</span>
+            <span class="page-info-value">{{film.director}}</span>
+          </li>
+          <li>
+            <span class="page-info-label">Producers</span>
+            <span class="page-info-value">{{film.producer}}</span>
+          </li>
+          <li>
+            <span class="page-info-label">Release Date</span>
+            <span class="page-info-value">{{film.release_date}}</span>
+          </li>
+        </ul>
+        <div v-if="people.length">
+          <h3>characters</h3>
+          <ol>
+            <li v-for="(person, index) in people" :key="index">
+              <b>{{person.name}}</b>
+              <div>{{person.gender}}</div>
+              <div>{{person.age}}</div>
+              <div>{{person.species}}</div>
+              <div>{{person.eye_color}}</div>
+              <div>{{person.hair_color}}</div>
+            </li>
+          </ol>
+        </div>
+        <div v-if="species.length">
+          <h3>species</h3>
+          <ol>
+            <li v-for="(spec, index) in species" :key="index">
+              <div>{{spec.name}}</div>
+              <div>{{spec.classification}}</div>
+              <div>{{spec.eye_colors}}</div>
+            </li>
+          </ol>
+        </div>
       </div>
-      <ul class="page-info">
-        <li>
-          <span class="page-info-label">Director</span>
-          <span class="page-info-value">{{film.director}}</span>
-        </li>
-        <li>
-          <span class="page-info-label">Producers</span>
-          <span class="page-info-value">{{film.producer}}</span>
-        </li>
-        <li>
-          <span class="page-info-label">Release Date</span>
-          <span class="page-info-value">{{film.release_date}}</span>
-        </li>
-      </ul>
     </div>
   </div>
 </template>
 
 <script>
-import { FilmService } from '@/service'
+// import store from '@/store'
+import ApiService, { FilmService, PeopleService, SpeciesService } from '@/service'
 export default {
   data () {
     return {
-      film: {}
+      film: {},
+      people: [],
+      species: []
     }
   },
-  beforeRouteEnter (to, from, next) {
-    FilmService.get(to.params.id).then(({data}) => {
-      next(vm => {
-        vm.film = data
-      })
+  mounted () {
+    this.$nextTick(() => {
+      //
     })
+  },
+  beforeRouteEnter (to, from, next) {
+    const findId = (str) => {
+      return str.split('/')[str.split('/').length - 1]
+    }
+
+    let isValidArray = arr => {
+      if (arr[0] !== arr[0].substring(0, arr[0].lastIndexOf('/') + 1)) return true
+      return false
+    }
+
+    const fetchSpecies = (arr) => {
+      return ApiService.all(arr.map(item => SpeciesService.get(findId(item)).then(({data}) => data)))
+    }
+
+    const fetchPeople = (arr) => {
+      return ApiService.all(arr.map(item => PeopleService.get(findId(item)).then(({data}) => data)))
+    }
+
+    FilmService.get(to.params.id)
+      .then(({data}) => {
+        let page = {
+          film: data,
+          people: [],
+          species: []
+        }
+        return ApiService.all([
+          isValidArray(data.species) && fetchSpecies(data.species)
+            .then(species => {
+              return { species }
+            }),
+          isValidArray(data.people) && fetchPeople(data.people)
+            .then(people => {
+              return { people }
+            })
+        ]).then(response => {
+          response.map(service => {
+            let key = Object.keys(service)[0]
+
+            if (key === 'species') {
+              service.species.map(species => {
+                page.species.push(species)
+              })
+            }
+
+            if (key === 'people') {
+              service.people.map(people => {
+                const findSpecies = response[0].species.find(species => {
+                  return species.id === findId(people.species)
+                })
+                people.species = findSpecies.name
+                page.people.push(people)
+              })
+            }
+          })
+
+          return page
+        })
+      })
+      .then(data => {
+        next(vm => {
+          vm.film = data.film
+          vm.people = data.people
+          vm.species = data.species
+          console.log('fetching data id:', vm.film.id, 'complete!')
+        })
+      })
+
+    // const getStoredData = store.getters.films.find(film => {
+    //   return film.id === to.params.id
+    // })
+
+    // if (getStoredData) {
+    //   next(vm => {
+    //     vm.film = getStoredData
+    //     console.log('get store data id:', vm.film.id, 'complete!')
+    //   })
+    // } else {
+
+    // }
   }
 }
 </script>
@@ -49,10 +155,11 @@ export default {
   background: #fff;
   box-shadow: 0 1px 2px rgba(0,0,0,0.25);
   min-height: 100vh;
+  border-radius: 8px 8px 0 0;
 }
 .page-thumbnail {
   height: 300px;
-  margin: 0 -16px;
+  // margin: 0 -16px;
   background: #f0f0f0;
 }
 .page-title {

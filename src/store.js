@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { FilmService } from './service'
-import { isEqual } from './utilities'
 
 Vue.use(Vuex)
 
@@ -14,29 +13,36 @@ export default new Vuex.Store({
     vehicles: []
   },
   mutations: {
+    removeFilm (state) {
+      while (state.films.length > 0) {
+        state.films.pop()
+      }
+    },
     addFilm (state, payload) {
       state.films.push(payload)
-    }
-  },
-  actions: {
-    getFilms (state, params) {
-      return FilmService
-        .get(params)
-        .then(({data}) => {
-          if (!isEqual(this.state.films, data)) {
-            data.map(film => {
-              state.commit('addFilm', film)
-            })
-          }
-        })
+    },
+    addPeople (state, payload) {
+      state.people.push(payload)
     }
   },
   getters: {
     films (state) {
       return state.films
-    },
-    getFilmById: (state) => id => {
-      return state.films.find(film => film.id === id)
+    }
+  },
+  actions: {
+    getFilms (state) {
+      if (this.state.films.length) {
+        return state.getters.films
+      }
+
+      return FilmService
+        .get()
+        .then(({data}) => {
+          data.map(film => {
+            state.commit('addFilm', film)
+          })
+        })
     }
   }
 })
