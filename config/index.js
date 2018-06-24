@@ -50,7 +50,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/ps-ghibli',
+    assetsPublicPath: 'https://arisunarya.github.io/ps-ghibli',
 
     /**
      * Source Maps
