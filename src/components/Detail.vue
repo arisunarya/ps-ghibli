@@ -3,12 +3,6 @@
     <div class="page">
       <div class="page-thumbnail"></div>
       <div class="page-content">
-        <h1 class="page-title">{{film.title}}</h1>
-        <p class="page-paragraph">{{film.description}}</p>
-        <div class="page-rating">
-          <span class="page-rating-label">Rating</span>
-          <span class="page-rating-value">{{film.rt_score}}</span>
-        </div>
         <ul class="page-info">
           <li>
             <span class="page-info-label">Director</span>
@@ -23,28 +17,62 @@
             <span class="page-info-value">{{film.release_date}}</span>
           </li>
         </ul>
+        <div class="page-rating">
+          <span class="page-rating-label">Rating</span>
+          <span class="page-rating-value">{{film.rt_score}}</span>
+        </div>
+        <h1 class="page-title">{{film.title}}</h1>
+        <h3>description</h3>
+        <p class="page-paragraph">{{film.description}}</p>
         <div v-if="people.length">
           <h3>characters</h3>
-          <ol>
+          <ul class="page-item-columns">
             <li v-for="(person, index) in people" :key="index">
-              <b>{{person.name}}</b>
-              <div>{{person.gender}}</div>
-              <div>{{person.age}}</div>
-              <div>{{person.species}}</div>
-              <div>{{person.eye_color}}</div>
-              <div>{{person.hair_color}}</div>
+              <div class="page-item">
+                <div class="page-item-thumbnail"></div>
+                <h4 class="page-item-name">{{person.name}}</h4>
+                <div class="page-item-info">
+                  <span>Gender</span>
+                  <div>{{person.gender}}</div>
+                </div>
+                <div class="page-item-info">
+                  <span>Age</span>
+                  <div>{{person.age}}</div>
+                </div>
+                <div class="page-item-info">
+                  <span>Species</span>
+                  <div>{{person.species}}</div>
+                </div>
+                <div class="page-item-info">
+                  <span>Eye Color</span>
+                  <div>{{person.eye_color}}</div>
+                </div>
+                <div class="page-item-info">
+                  <span>Hair Color</span>
+                  <div>{{person.hair_color}}</div>
+                </div>
+              </div>
             </li>
-          </ol>
+          </ul>
         </div>
         <div v-if="species.length">
           <h3>species</h3>
-          <ol>
+          <ul class="page-item-columns">
             <li v-for="(spec, index) in species" :key="index">
-              <div>{{spec.name}}</div>
-              <div>{{spec.classification}}</div>
-              <div>{{spec.eye_colors}}</div>
+              <div class="page-item">
+                <div class="page-item-thumbnail"></div>
+                <h4 class="page-item-name">{{spec.name}}</h4>
+                <div class="page-item-info">
+                  <span>Classified</span>
+                  <div>{{spec.classification}}</div>
+                </div>
+                <div class="page-item-info page-item-info_colors">
+                  <span>Eye Colors</span>
+                  <div>{{spec.eye_colors}}</div>
+                </div>
+              </div>
             </li>
-          </ol>
+          </ul>
         </div>
       </div>
     </div>
@@ -156,22 +184,22 @@ export default {
   box-shadow: 0 1px 2px rgba(0,0,0,0.25);
   min-height: 100vh;
   border-radius: 8px 8px 0 0;
+  overflow: hidden;
 }
 .page-thumbnail {
   height: 300px;
-  // margin: 0 -16px;
-  background: #f0f0f0;
+  background: #333;
 }
 .page-title {
   margin: 0 0 16px;
   font-size: 32px;
 }
 .page-paragraph {
-  margin: 0;
+  margin: 0 0 32px;
 }
 .page-content {
   position: relative;
-  padding: 32px;
+  padding: 0 32px 32px;
 }
 .page-rating {
   position: absolute;
@@ -213,6 +241,90 @@ export default {
   &-value {
     font-size: 32px;
     font-weight: bold;
+  }
+}
+.page-info {
+  display: flex;
+  list-style: none;
+  padding-left: 0;
+  padding-right: 80px;
+  margin: 0 -32px 32px;
+  background: #a924f5;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  color: #fff;
+
+  > li {
+    flex: 1;
+    padding: 16px 32px;
+
+    + li {
+      border-left: 1px solid rgba(0,0,0,0.075);
+    }
+
+    > span {
+      display: block;
+
+      + span {
+        margin-top: 8px;
+      }
+    }
+  }
+}
+.page-info-label {
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1;
+}
+.page-info-value {
+  line-height: 1;
+}
+.page-item-columns {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0 -33px 0 -32px;
+  border-top: 1px solid #eee;
+  box-shadow: inset 0 -1px 0 0 #eee;
+
+  > li {
+    display: flex;
+    width: (100%) / 4;
+    box-shadow: -1px -1px 0 0 #eee;
+  }
+}
+.page-item {
+  flex: 1;
+  background: #fff;
+  padding: 32px 32px 16px;
+  box-shadow: inset -1px -1px 0 0 #eee;
+}
+.page-item-thumbnail {
+  height: 154px;
+  margin: 0 0 16px;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+.page-item-name {
+  margin: 0 0 16px;
+  font-size: 14px;
+  text-align: center;
+}
+.page-item-info {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 13px;
+  justify-content: space-between;
+  border-top: 1px solid #f5f5f5;
+  line-height: 1.25;
+  padding: 4px 0;
+
+  div,
+  span {
+    padding: 4px 0;
+  }
+  span {
+    color: #999;
   }
 }
 </style>

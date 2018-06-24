@@ -4,8 +4,6 @@
       <br/>
       <br/>
       <router-link to="/">Films ({{films.length}})</router-link>
-      &nbsp;
-      <router-link to="/people">People ({{0}})</router-link>
       <br/>
       <br/>
     </div>
